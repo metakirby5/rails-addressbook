@@ -1,5 +1,9 @@
 source 'https://rubygems.org'
 
+# Customs
+gem 'haml-rails'
+gem 'bootstrap-sass'
+gem 'thin'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.0'
