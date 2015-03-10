@@ -18,41 +18,50 @@
   classify = (c) ->
     '.' + c
 
-  # get dom element data-id
-  getId = (elt) ->
-    elt.data 'id'
+  # get tr element data-id
+  idOf = (row) ->
+    row.data 'id'
 
   # get whether or not friends with current tr
-  friendsWith = (elt) ->
-    elt.data 'friended'
+  friendsWith = (row) ->
+    row.data 'friended'
 
   # friend a tr
-  friend = (elt) ->
-    elt.data 'friended', 1
+  friend = (row, heart) ->
+    row.data 'friended', 1
+    heart.html HEART_TOGGLE(true)
 
   # unfriend a tr
-  unfriend = (elt) ->
-    elt.data 'friended', 0
+  unfriend = (row, heart) ->
+    row.data 'friended', 0
+    heart.html HEART_TOGGLE(false)
 
   # get contact info for current tr
-  contactInfoFor = (elt) ->
+  contactInfoFor = (row) ->
     {
-      name: do $(elt.children('.name')[0]).text
-      email: do $(elt.children('.email')[0]).text
-      phone: do $(elt.children('.phone')[0]).text
+      name: do $(row.children('.name')[0]).text
+      email: do $(row.children('.email')[0]).text
+      phone: do $(row.children('.phone')[0]).text
     }
 
   # turn edit mode on
-  editon = (elt) ->
-    elt.data 'editing', true
-    elt.addClass EDITING
-    do elt.text
+  editOn = (cell) ->
+    cell.data 'editing', true
+    cell.addClass EDITING
+    do cell.text
 
   # switch textbox back to table cell
-  editoff = (elt, text) ->
-    elt.data 'editing', false
-    elt.removeClass EDITING
-    elt.text text
+  editOff = (cell, text) ->
+    cell.data 'editing', false
+    cell.removeClass EDITING
+    cell.text text
+
+  # add errors to alert
+  addErrors = (errs) ->
+    $(document).trigger 'add-alerts', ({
+    message: err,
+    priority: 'warning'
+    } for err in errs)
 
   # callback to edit table cell
   # http://mrbool.com/how-to-create-an-editable-html-table-with-jquery/27425
@@ -60,7 +69,7 @@
     elt = $(this)
     if not elt.data 'editing'
       # turn on editing
-      orig = editon elt
+      orig = editOn elt
 
       # make into textbox
       elt.html TEXT_INPUT(orig)
@@ -78,42 +87,65 @@
           # strip phone non-numbers
           if elt.hasClass 'phone'
             newtext = newtext.replace /\D/g,''
-          editoff elt, newtext
+          editOff elt, newtext
 
           # begin ajax
           row = do elt.parent
           $.ajax {
             method: 'PUT',
-            url: "/contacts/#{getId(row)}",
+            url: "/contacts/#{idOf(row)}",
             data: contactInfoFor row
             error: (x) ->
               # reset text
               elt.text orig
 
               # display errors
-              errs = $.parseJSON(x.responseText).errors
-              $(document).trigger 'add-alerts', ({
-                message: err,
-                priority: 'warning'
-              } for err in errs)
+              addErrors $.parseJSON(x.responseText).errors
           }
 
       # cancel on defocus
       textbox.blur ->
-        editoff elt, orig
+        editOff elt, orig
 
   # callback to friend/unfriend
   editToggle = ->
     elt = $(this)
     row = do elt.parent
 
-    console.log row.data('friended')
+    # clear alerts
+    $(document).trigger 'clear-alerts'
+
     if friendsWith row
-      unfriend row
-      elt.html HEART_TOGGLE false
+      unfriend row, elt
+
+      # begin ajax
+      $.ajax {
+        method: 'DELETE',
+        url: "/friendships/#{idOf(row)}",
+        error: (x) ->
+          # reset friend-ness
+          friend row, elt
+
+          # display errors
+          addErrors $.parseJSON(x.responseText).errors
+      }
     else
-      friend row
-      elt.html HEART_TOGGLE true
+      friend row, elt
+
+      # begin ajax
+      $.ajax {
+        method: 'POST',
+        url: "/friendships",
+        data: {
+          id: idOf row
+        }
+        error: (x) ->
+          # reset friend-ness
+          unfriend row, elt
+
+          # display errors
+          addErrors $.parseJSON(x.responseText).errors
+      }
 
   $ ->
     # Set up error box
