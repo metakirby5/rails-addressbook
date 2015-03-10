@@ -5,6 +5,8 @@
 table#contacts > tbody > tr,
 table#contacts > thead > tr {
   & > td, & > th {
+    vertical-align: middle;
+
     &.add-delete {
       width: 20px;
       text-align: center;
