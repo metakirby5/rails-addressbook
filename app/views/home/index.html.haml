@@ -5,25 +5,37 @@
   %table.table#contacts
     %thead
       %tr
-        %th
-          %span.delete.glyphicon.glyphicon-trash
-        %th
-          %span.is-friend.glyphicon.glyphicon-heart
-        %th
-          %span.name.glyphicon.glyphicon-user
-          User
-        %th
-          %span.email.glyphicon.glyphicon-envelope
-          Email
-        %th
-          %span.phone.glyphicon.glyphicon-phone
-          Phone
-    - @contacts.each do |contact|
-      %tr{data: {id: contact.id, friended: @friended[contact.id] ? 1 : 0}}
-        %td.delete.editable-trash
+        %th.add-delete
           %span.glyphicon.glyphicon-trash
-        %td.is-friend.editable-heart
-          %span.glyphicon{class: @friended[contact.id] ? 'glyphicon-heart' : 'glyphicon-heart-empty'}
-        %td.name.editable-text= contact.name
-        %td.email.editable-text= contact.email
-        %td.phone.editable-text= contact.phone
+        %th.is-friend
+          %span.glyphicon.glyphicon-heart
+        %th.name
+          %span.glyphicon.glyphicon-user
+          User
+        %th.email
+          %span.glyphicon.glyphicon-envelope
+          Email
+        %th.phone
+          %span.glyphicon.glyphicon-phone
+          Phone
+    %tbody
+      %tr.new-contact
+        %td.add-delete
+          %span.glyphicon.glyphicon-plus
+        %td.is-friend
+          %span.glyphicon.glyphicon-heart-empty
+        %td.name
+          %input{type: 'text'}
+        %td.email
+          %input{type: 'text'}
+        %td.phone
+          %input{type: 'text'}
+      - @contacts.each do |contact|
+        %tr.existing-contact{data: {id: contact.id, friended: @friended[contact.id] ? 1 : 0}}
+          %td.add-delete.editable-trash
+            %span.glyphicon.glyphicon-trash
+          %td.is-friend.editable-heart
+            %span.glyphicon{class: @friended[contact.id] ? 'glyphicon-heart' : 'glyphicon-heart-empty'}
+          %td.name.editable-text= contact.name
+          %td.email.editable-text= contact.email
+          %td.phone.editable-text= contact.phone

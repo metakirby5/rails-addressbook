@@ -2,28 +2,29 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
-table.table#contacts > tbody > tr {
-  td {
-    &.delete {
+table#contacts > tbody > tr,
+table#contacts > thead > tr {
+  & > td, & > th {
+    &.add-delete {
       width: 20px;
+      text-align: center;
     }
     &.is-friend {
       width: 20px;
+      text-align: center;
     }
     &.name {
-      width: 100px;
+      width: 30%;
     }
     &.email {
-      width: 100px;
+      width: 30%;
     }
     &.phone {
-      width: 100px;
+      width: 30%;
     }
-    input {
-      width: 100%;
-      line-height: 1;
-    }
-    input {
+  }
+  &.existing-contact {
+    & > input {
       display: inline-block;
       padding: 0;
       margin: 0;

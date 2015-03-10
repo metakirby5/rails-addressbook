@@ -15,7 +15,7 @@ class PhoneValidator < ActiveModel::EachValidator
 end
 
 class Contact < ActiveRecord::Base
-  has_many :friendships
+  has_many :friendships, dependent: :delete_all
   has_many :users, through: :friendships
 
   validates :name, presence: true
