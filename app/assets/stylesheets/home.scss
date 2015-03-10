@@ -10,10 +10,12 @@ table#contacts > thead > tr {
     &.add-delete {
       width: 20px;
       text-align: center;
+      cursor: pointer;
     }
     &.is-friend {
       width: 20px;
       text-align: center;
+      cursor: pointer;
     }
     &.name {
       width: 30%;
@@ -24,16 +26,22 @@ table#contacts > thead > tr {
     &.phone {
       width: 30%;
     }
-  }
-  &.existing-contact {
+
     & > input {
-      display: inline-block;
-      padding: 0;
-      margin: 0;
-      border: 0;
       width: 100%;
-      border-radius: 0;
-      line-height: 1;
+    }
+  }
+
+  &.existing-contact {
+    td, th {
+      cursor: pointer;
+
+      & > input {
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+        border: 0;
+      }
     }
   }
 }
