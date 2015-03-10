@@ -17,10 +17,9 @@
           %span.glyphicon.glyphicon-phone
           Phone
     - @contacts.each do |contact|
-      %tr{data: {id: contact.id}}
+      %tr{data: {id: contact.id, friended: @friended[contact.id] ? 1 : 0}}
         %td.is-friend.editable-toggle
-          %span.glyphicon{data: {friended: @friended[contact.id]},
-                          class: @friended[contact.id] ? 'glyphicon-heart' : 'glyphicon-heart-empty'}
+          %span.glyphicon{class: @friended[contact.id] ? 'glyphicon-heart' : 'glyphicon-heart-empty'}
         %td.name.editable-text= contact.name
         %td.email.editable-text= contact.email
         %td.phone.editable-text= contact.phone

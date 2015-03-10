@@ -12,7 +12,7 @@
   TEXT_INPUT = (val) ->
     "<input type='text' value='#{val}' />"
   HEART_TOGGLE = (turnon) ->
-    "<span class='glyphicon glyphicon-heart#{if turnon then '' else 'empty'}'>"
+    "<span class='glyphicon glyphicon-heart#{if turnon then '' else '-empty'}'>"
 
   # make string into css class
   classify = (c) ->
@@ -23,16 +23,30 @@
     elt.data 'id'
 
   # get whether or not friends with current tr
-  getFriendship = (elt) ->
-    true #TODO
+  friendsWith = (elt) ->
+    elt.data 'friended'
+
+  # friend a tr
+  friend = (elt) ->
+    elt.data 'friended', 1
+
+  # unfriend a tr
+  unfriend = (elt) ->
+    elt.data 'friended', 0
 
   # get contact info for current tr
-  getContactInfo = (elt) ->
+  contactInfoFor = (elt) ->
     {
       name: do $(elt.children('.name')[0]).text
       email: do $(elt.children('.email')[0]).text
       phone: do $(elt.children('.phone')[0]).text
     }
+
+  # turn edit mode on
+  editon = (elt) ->
+    elt.data 'editing', true
+    elt.addClass EDITING
+    do elt.text
 
   # switch textbox back to table cell
   editoff = (elt, text) ->
@@ -46,9 +60,7 @@
     elt = $(this)
     if not elt.data 'editing'
       # turn on editing
-      elt.data 'editing', true
-      elt.addClass EDITING
-      orig = do elt.text
+      orig = editon elt
 
       # make into textbox
       elt.html TEXT_INPUT(orig)
@@ -73,7 +85,7 @@
           $.ajax {
             method: 'PUT',
             url: "/contacts/#{getId(row)}",
-            data: getContactInfo row
+            data: contactInfoFor row
             error: (x) ->
               # reset text
               elt.text orig
@@ -93,6 +105,15 @@
   # callback to friend/unfriend
   editToggle = ->
     elt = $(this)
+    row = do elt.parent
+
+    console.log row.data('friended')
+    if friendsWith row
+      unfriend row
+      elt.html HEART_TOGGLE false
+    else
+      friend row
+      elt.html HEART_TOGGLE true
 
   $ ->
     # Set up error box
