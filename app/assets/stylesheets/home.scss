@@ -4,6 +4,9 @@
 
 table.table#contacts > tbody > tr {
   td {
+    &.delete {
+      width: 20px;
+    }
     &.is-friend {
       width: 20px;
     }

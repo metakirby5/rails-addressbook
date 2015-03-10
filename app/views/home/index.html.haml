@@ -6,19 +6,23 @@
     %thead
       %tr
         %th
-          %span.glyphicon.glyphicon-heart
+          %span.delete.glyphicon.glyphicon-trash
         %th
-          %span.glyphicon.glyphicon-user
+          %span.is-friend.glyphicon.glyphicon-heart
+        %th
+          %span.name.glyphicon.glyphicon-user
           User
         %th
-          %span.glyphicon.glyphicon-envelope
+          %span.email.glyphicon.glyphicon-envelope
           Email
         %th
-          %span.glyphicon.glyphicon-phone
+          %span.phone.glyphicon.glyphicon-phone
           Phone
     - @contacts.each do |contact|
       %tr{data: {id: contact.id, friended: @friended[contact.id] ? 1 : 0}}
-        %td.is-friend.editable-toggle
+        %td.delete.editable-trash
+          %span.glyphicon.glyphicon-trash
+        %td.is-friend.editable-heart
           %span.glyphicon{class: @friended[contact.id] ? 'glyphicon-heart' : 'glyphicon-heart-empty'}
         %td.name.editable-text= contact.name
         %td.email.editable-text= contact.email

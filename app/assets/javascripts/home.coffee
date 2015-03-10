@@ -7,7 +7,8 @@
 (($, _) ->
 
   EDITABLE_TEXT = 'editable-text'
-  EDITABLE_TOGGLE = 'editable-toggle'
+  EDITABLE_HEART = 'editable-heart'
+  EDITABLE_TRASH = 'editable-trash'
   EDITING = 'editable-text-editing'
   TEXT_INPUT = (val) ->
     "<input type='text' value='#{val}' />"
@@ -108,7 +109,7 @@
         editOff elt, orig
 
   # callback to friend/unfriend
-  editToggle = ->
+  editToggleFriend = ->
     elt = $(this)
     row = do elt.parent
 
@@ -147,6 +148,29 @@
           addErrors $.parseJSON(x.responseText).errors
       }
 
+  # callback to delete contact
+  deleteContact = ->
+    elt = $(this)
+    row = do elt.parent
+
+    # instant hide
+    do row.hide
+
+    # begin ajax
+    $.ajax {
+      method: 'DELETE',
+      url: "/contacts/#{idOf(row)}",
+      success: ->
+        # get rid of the row for good
+        do row.remove
+      error: (x) ->
+        # re-show
+        do row.show
+
+        # display errors
+        addErrors $.parseJSON(x.responseText).errors
+    }
+
   $ ->
     # Set up error box
     $('#alerts').bsAlerts {
@@ -157,6 +181,7 @@
     }
 
     $(classify EDITABLE_TEXT).click editText
-    $(classify EDITABLE_TOGGLE).click editToggle
+    $(classify EDITABLE_HEART).click editToggleFriend
+    $(classify EDITABLE_TRASH).click deleteContact
 
 )(window.jQuery, window._)
