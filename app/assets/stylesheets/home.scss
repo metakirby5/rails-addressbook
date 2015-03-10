@@ -1,3 +1,33 @@
 // Place all the styles related to the home controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+table.table#contacts > tbody > tr {
+  td {
+    &.is-friend {
+      width: 20px;
+    }
+    &.name {
+      width: 100px;
+    }
+    &.email {
+      width: 100px;
+    }
+    &.phone {
+      width: 100px;
+    }
+    input {
+      width: 100%;
+      line-height: 1;
+    }
+    input {
+      display: inline-block;
+      padding: 0;
+      margin: 0;
+      border: 0;
+      width: 100%;
+      border-radius: 0;
+      line-height: 1;
+    }
+  }
+}

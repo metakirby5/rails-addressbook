@@ -1,7 +1,7 @@
 %h1 Contacts
 
 .table-responsive
-  %table.table
+  %table.table#contacts
     %thead
       %tr
         %th
@@ -17,8 +17,8 @@
           Phone
     - @contacts.each do |contact|
       %tr
-        %td
-          %span.glyphicon.glyphicon-heart-empty
-        %td= contact.name
-        %td= contact.email
-        %td= contact.phone
+        %td.is-friend.editable-toggle
+          %span.glyphicon.glyphicon-heart-empty{data: {friended: true}}
+        %td.name.editable-text= contact.name
+        %td.email.editable-text= contact.email
+        %td.phone.editable-text= contact.phone
