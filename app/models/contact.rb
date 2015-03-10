@@ -15,6 +15,9 @@ class PhoneValidator < ActiveModel::EachValidator
 end
 
 class Contact < ActiveRecord::Base
+  has_many :friendships
+  has_many :users, through: :friendships
+
   validates :name, presence: true
   validates :email, presence: true, uniqueness: true, email: true
   validates :phone, presence: true, uniqueness: true, phone: true
