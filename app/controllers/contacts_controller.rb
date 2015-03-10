@@ -43,7 +43,7 @@ class ContactsController < ApplicationController
 
 private
   def contacts_params
-    params.permit(:name, :email, :phone)
+    params.permit :name, :email, :phone
   end
 
   def succ_json(data)
