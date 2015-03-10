@@ -14,7 +14,11 @@ class FriendshipsController < ApplicationController
   end
 
   def destroy
-
+    @contact = current_user.contacts.delete params[:id]
+  rescue ActiveRecord::RecordNotFound => e
+    render err_json([e.message], 410)
+  else
+    render succ_json(@contact)
   end
 
 private
