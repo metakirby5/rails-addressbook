@@ -8,15 +8,14 @@ end
 
 class PhoneValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    unless value =~ /\A\d{7}|\d{10,11}\z/i
+    unless value =~ /\A(\d{7}|\d{10,11})\z/i
       record.errors[attribute] << (options[:message] || "is not a phone number")
     end
   end
 end
 
 class Contact < ActiveRecord::Base
-  validates :email,
-            uniqueness: {case_sensitive: false}, email: true
-  validates :phone,
-            uniqueness: {case_sensitive: false}, phone: true
+  validates :name, presence: true
+  validates :email, presence: true, uniqueness: true, email: true
+  validates :phone, presence: true, uniqueness: true, phone: true
 end
