@@ -1,2 +1,24 @@
-%h1 Home#index
-%p Find me in app/views/home/index.html.haml
+%h1 Contacts
+
+.table-responsive
+  %table.table
+    %thead
+      %tr
+        %th
+          %span.glyphicon.glyphicon-heart
+        %th
+          %span.glyphicon.glyphicon-user
+          User
+        %th
+          %span.glyphicon.glyphicon-envelope
+          Email
+        %th
+          %span.glyphicon.glyphicon-phone
+          Phone
+    - @contacts.each do |contact|
+      %tr
+        %td
+          %span.glyphicon.glyphicon-heart-empty
+        %td= contact.name
+        %td= contact.email
+        %td= contact.phone
