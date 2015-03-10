@@ -14,84 +14,96 @@
   HEART_TOGGLE = (turnon) ->
     "<span class='glyphicon glyphicon-heart#{if turnon then '' else 'empty'}'>"
 
+  # make string into css class
   classify = (c) ->
     '.' + c
 
+  # get dom element data-id
   getId = (elt) ->
-    elt.data('id')
+    elt.data 'id'
 
+  # get whether or not friends with current tr
   getFriendship = (elt) ->
     true #TODO
 
+  # get contact info for current tr
   getContactInfo = (elt) ->
     {
-      name: $(elt.children('.name')[0]).text()
-      email: $(elt.children('.email')[0]).text()
-      phone: $(elt.children('.phone')[0]).text()
+      name: do $(elt.children('.name')[0]).text
+      email: do $(elt.children('.email')[0]).text
+      phone: do $(elt.children('.phone')[0]).text
     }
 
-  editoff = (elt) ->
-    elt.removeClass(EDITING)
-    elt.data('editing', false)
+  # switch textbox back to table cell
+  editoff = (elt, text) ->
+    elt.data 'editing', false
+    elt.removeClass EDITING
+    elt.text text
 
+  # callback to edit table cell
   # http://mrbool.com/how-to-create-an-editable-html-table-with-jquery/27425
   editText = ->
     elt = $(this)
-    if not elt.data('editing')
-      elt.data('editing', true)
-      orig = elt.text()
+    if not elt.data 'editing'
+      # turn on editing
+      elt.data 'editing', true
+      elt.addClass EDITING
+      orig = do elt.text
 
-      elt.addClass(EDITING)
-      elt.html(TEXT_INPUT(orig))
+      # make into textbox
+      elt.html TEXT_INPUT(orig)
+      textbox = do elt.children().first
+      do textbox.focus
 
-      textbox = elt.children().first()
-      textbox.focus()
-
-      textbox.keypress((e) ->
+      textbox.keypress (e) ->
+        # on enter key
         if e.which == 13
-          newtext = textbox.val()
+          # clear alerts
+          $(document).trigger 'clear-alerts'
+
+          # apply text changes
+          newtext = do textbox.val
           # strip phone non-numbers
-          if elt.hasClass('phone')
-            newtext = newtext.replace(/\D/g,'')
-          elt.text(newtext)
-          editoff(elt)
+          if elt.hasClass 'phone'
+            newtext = newtext.replace /\D/g,''
+          editoff elt, newtext
 
           # begin ajax
-          row = elt.parent()
-          $.ajax({
+          row = do elt.parent
+          $.ajax {
             method: 'PUT',
             url: "/contacts/#{getId(row)}",
-            data: getContactInfo(row)
+            data: getContactInfo row
             error: (x) ->
-              elt.text(orig)
-              $(document).trigger('clear-alerts')
+              # reset text
+              elt.text orig
+
+              # display errors
               errs = $.parseJSON(x.responseText).errors
-              $(document).trigger('add-alerts', ({
+              $(document).trigger 'add-alerts', ({
                 message: err,
                 priority: 'warning'
-              } for err in errs));
-          })
-      )
+              } for err in errs)
+          }
 
-      textbox.blur(->
-        elt.text(orig)
-        editoff(elt)
-      )
+      # cancel on defocus
+      textbox.blur ->
+        editoff elt, orig
 
+  # callback to friend/unfriend
   editToggle = ->
     elt = $(this)
 
-  $(->
+  $ ->
     # Set up error box
-    # %div{data: {alerts: 'alerts', titles: '{"error": "<em>Error!</em>"}', ids: 'ajax-errors', fade: '6000'}}}
-    $('#alerts').bsAlerts({
+    $('#alerts').bsAlerts {
       titles: {
         warning: '<em>Error!</em>',
       },
       fade: 6000
-    })
+    }
 
-    $(classify(EDITABLE_TEXT)).click(editText)
-    $(classify(EDITABLE_TOGGLE)).click(editToggle)
-  )
+    $(classify EDITABLE_TEXT).click editText
+    $(classify EDITABLE_TOGGLE).click editToggle
+
 )(window.jQuery, window._)
