@@ -11,16 +11,16 @@ Contact.create [
   {
       name:   'Ethan',
       email:  'me@ethan.com',
-      phone:  '(xxx) xxx-xxxx',
+      phone:  '1111111',
   },
   {
       name:   'Richard',
       email:  'me@richard.com',
-      phone:  '(yyy) yyy-yyyy',
+      phone:  '2222222222',
   },
   {
       name:   'Kavin',
       email:  'me@askkav.in',
-      phone:  '(zzz) zzz-zzzz',
+      phone:  '33333333333',
   },
 ]
