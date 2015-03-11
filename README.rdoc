@@ -1,5 +1,7 @@
 == README
 
+My first Rails app: a small address book app.
+
 Remember to <tt>gem install</tt>!
 
 === FEATURES
