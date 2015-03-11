@@ -18,16 +18,16 @@
           %span.glyphicon.glyphicon-phone
           Phone
     %tbody
-      %tr.new-contact
-        %td.add-delete
+      %tr.new-contact{data: {friended: 0}}
+        %td.add-delete.new-plus
           %span.glyphicon.glyphicon-plus
-        %td.is-friend
+        %td.is-friend.new-heart
           %span.glyphicon.glyphicon-heart-empty
-        %td.name
+        %td.name.new-text
           %input{type: 'text'}
-        %td.email
+        %td.email.new-text
           %input{type: 'text'}
-        %td.phone
+        %td.phone.new-text
           %input{type: 'text'}
       - @contacts.each do |contact|
         %tr.existing-contact{data: {id: contact.id, friended: @friended[contact.id] ? 1 : 0}}

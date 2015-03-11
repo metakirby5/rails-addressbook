@@ -4,16 +4,39 @@
 #= require jquery.bsAlerts.min
 #= require lodash.min
 
-(($, _) ->
+(($, _) -> $ ->
+
+  NEW_TEXT = 'new-text'
+  NEW_HEART = 'new-heart'
+  NEW_PLUS = 'new-plus'
 
   EDITABLE_TEXT = 'editable-text'
   EDITABLE_HEART = 'editable-heart'
   EDITABLE_TRASH = 'editable-trash'
   EDITING = 'editable-text-editing'
+
   TEXT_INPUT = (val) ->
     "<input type='text' value='#{val}' />"
   HEART_TOGGLE = (turnon) ->
     "<span class='glyphicon glyphicon-heart#{if turnon then '' else '-empty'}'>"
+  NEW_CONTACT = (id, friended, name, email, phone) -> "
+    <tr class='existing-contact' data-id='#{id}' data-friended='#{if friended then 1 else 0}'>
+      <td class='add-delete editable-trash'>
+        <span class='glyphicon glyphicon-trash'></span>
+      </td>
+      <td class='is-friend editable-heart'>
+        <span class='glyphicon glyphicon-heart#{if friended then '' else '-empty'}'></span>
+      </td>
+      <td class='name editable-text'>
+        #{name}
+      </td>
+      <td class='email editable-text'>
+        #{email}
+      </td>
+      <td class='name editable-text'>
+        #{phone}
+      </td>
+  "
 
   # make string into css class
   classify = (c) ->
@@ -38,12 +61,23 @@
     heart.html HEART_TOGGLE(false)
 
   # get contact info for current tr
-  contactInfoFor = (row) ->
-    {
-      name: do $(row.children('.name')[0]).text
-      email: do $(row.children('.email')[0]).text
-      phone: do $(row.children('.phone')[0]).text
-    }
+  contactInfoFor = (row, input = false) ->
+    namecell =  $(row.children('.name')[0])
+    emailcell = $(row.children('.email')[0])
+    phonecell =   $(row.children('.phone')[0])
+
+    if input
+      {
+        name: do $(namecell.find('input')[0]).val
+        email: do $(emailcell.find('input')[0]).val
+        phone: do $(phonecell.find('input')[0]).val
+      }
+    else
+      {
+        name: do namecell.text
+        email: do emailcell.text
+        phone: do phonecell.text
+      }
 
   # turn edit mode on
   editOn = (cell) ->
@@ -63,6 +97,9 @@
     message: err,
     priority: 'warning'
     } for err in errs)
+
+  # inputs for new contact
+  $newInputs = $(classify NEW_TEXT).find('input')
 
   # callback to edit table cell
   # http://mrbool.com/how-to-create-an-editable-html-table-with-jquery/27425
@@ -94,8 +131,8 @@
           row = do elt.parent
           $.ajax {
             method: 'PUT',
-            url: "/contacts/#{idOf(row)}",
-            data: contactInfoFor row
+            url: "/contacts/#{idOf row}",
+            data: contactInfoFor(row),
             error: (x) ->
               # reset text
               elt.text orig
@@ -122,7 +159,7 @@
       # begin ajax
       $.ajax {
         method: 'DELETE',
-        url: "/friendships/#{idOf(row)}",
+        url: "/friendships/#{idOf row}",
         error: (x) ->
           # reset friend-ness
           friend row, elt
@@ -139,7 +176,7 @@
         url: "/friendships",
         data: {
           id: idOf row
-        }
+        },
         error: (x) ->
           # reset friend-ness
           unfriend row, elt
@@ -159,7 +196,7 @@
     # begin ajax
     $.ajax {
       method: 'DELETE',
-      url: "/contacts/#{idOf(row)}",
+      url: "/contacts/#{idOf row}",
       success: ->
         # get rid of the row for good
         do row.remove
@@ -171,17 +208,81 @@
         addErrors $.parseJSON(x.responseText).errors
     }
 
-  $ ->
-    # Set up error box
-    $('#alerts').bsAlerts {
-      titles: {
-        warning: '<em>Error!</em>',
-      },
-      fade: 6000
+  # callback to set friend status on new contact
+  addTogggleFriend = ->
+    elt = $(this)
+    row = do elt.parent
+
+    if friendsWith row
+      unfriend row, elt
+    else
+      friend row, elt
+
+  # callback to add contact
+  addContact = ->
+    elt = $(this)
+    row = do elt.parent
+    console.log row
+
+    # clear alerts
+    $(document).trigger 'clear-alerts'
+
+    # don't instant add - let server vaidate first
+    # (too lazy for client-side validation with jquery...)
+    $.ajax {
+      method : 'POST',
+      url: "/contacts",
+      data: contactInfoFor(row, true),
+
+      success: (data) ->
+        # register friend if necessary
+        if friendsWith(row)
+          $.ajax {
+            method: 'POST',
+            url: "/friendships",
+            data: {
+              id: data.id
+            },
+            success: ->
+              # insert the new row after this one
+              row.after NEW_CONTACT data.id, true, data.name, data.email, data.phone
+            error: (x) ->
+              # insert the new row after this one, without friends
+              row.after NEW_CONTACT data.id, false, data.name, data.email, data.phone
+
+              # display errors
+              addErrors $.parseJSON(x.responseText).errors
+          }
+        else
+          row.after NEW_CONTACT data.id, false, data.name, data.email, data.phone
+
+        # clear input
+        $newInputs.val ''
+        unfriend row, $(NEW_HEART)
+
+      error: (x)->
+        # display errors
+        addErrors $.parseJSON(x.responseText).errors
     }
 
-    $(classify EDITABLE_TEXT).click editText
-    $(classify EDITABLE_HEART).click editToggleFriend
-    $(classify EDITABLE_TRASH).click deleteContact
+  # Set up error box
+  $('#alerts').bsAlerts {
+    titles: {
+      warning: '<em>Error!</em>',
+    },
+    fade: 6000
+  }
+
+  # enter key on new contact fields
+  $newInputs.keypress (e) ->
+    if e.which == 13
+      addContact.call $(this).parent()
+
+  $(classify NEW_HEART).click addTogggleFriend
+  $(classify NEW_PLUS).click addContact
+
+  $(classify EDITABLE_TEXT).click editText
+  $(classify EDITABLE_HEART).click editToggleFriend
+  $(classify EDITABLE_TRASH).click deleteContact
 
 )(window.jQuery, window._)
