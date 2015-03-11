@@ -19,24 +19,27 @@
     "<input type='text' value='#{val}' />"
   HEART_TOGGLE = (turnon) ->
     "<span class='glyphicon glyphicon-heart#{if turnon then '' else '-empty'}'>"
-  NEW_CONTACT = (id, friended, name, email, phone) -> "
-    <tr class='existing-contact' data-id='#{id}' data-friended='#{if friended then 1 else 0}'>
+
+  newContact = (putAfter, id, friended, name, email, phone) ->
+    putAfter.after "
+    <tr class='newly-added existing-contact' data-id='#{id}' data-friended='#{if friended then 1 else 0}'>
       <td class='add-delete editable-trash'>
         <span class='glyphicon glyphicon-trash'></span>
       </td>
       <td class='is-friend editable-heart'>
         <span class='glyphicon glyphicon-heart#{if friended then '' else '-empty'}'></span>
       </td>
-      <td class='name editable-text'>
-        #{name}
-      </td>
-      <td class='email editable-text'>
-        #{email}
-      </td>
-      <td class='name editable-text'>
-        #{phone}
-      </td>
-  "
+      <td class='name editable-text'>#{name}</td>
+      <td class='email editable-text'>#{email}</td>
+      <td class='name editable-text'>#{phone}</td>
+    </tr>
+    "
+    # add hooks
+    $newlyAdded = $('.newly-added')
+    $newlyAdded.find(classify EDITABLE_TEXT).click editText
+    $newlyAdded.find(classify EDITABLE_HEART).click editToggleFriend
+    $newlyAdded.find(classify EDITABLE_TRASH).click deleteContact
+    $newlyAdded.removeClass 'newly-added'
 
   # make string into css class
   classify = (c) ->
@@ -222,7 +225,6 @@
   addContact = ->
     elt = $(this)
     row = do elt.parent
-    console.log row
 
     # clear alerts
     $(document).trigger 'clear-alerts'
@@ -245,16 +247,16 @@
             },
             success: ->
               # insert the new row after this one
-              row.after NEW_CONTACT data.id, true, data.name, data.email, data.phone
+              newContact row, data.id, true, data.name, data.email, data.phone
             error: (x) ->
               # insert the new row after this one, without friends
-              row.after NEW_CONTACT data.id, false, data.name, data.email, data.phone
+              newContact row, data.id, false, data.name, data.email, data.phone
 
               # display errors
               addErrors $.parseJSON(x.responseText).errors
           }
         else
-          row.after NEW_CONTACT data.id, false, data.name, data.email, data.phone
+          newContact row, data.id, false, data.name, data.email, data.phone
 
         # clear input
         $newInputs.val ''

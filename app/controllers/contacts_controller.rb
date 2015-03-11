@@ -1,6 +1,6 @@
 class ContactsController < ApplicationController
   def index
-    @contacts = Contact.all
+    @contacts = Contact.order(created_at: :desc)
     render succ_json(@contacts)
   end
 

@@ -2,6 +2,10 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 
+input#search {
+  margin-bottom: 20px;
+}
+
 table#contacts > tbody > tr,
 table#contacts > thead > tr {
   & > td, & > th {

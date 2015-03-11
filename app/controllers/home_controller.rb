@@ -1,6 +1,6 @@
 class HomeController < ApplicationController
   def index
-    @contacts = Contact.all
+    @contacts = Contact.order(created_at: :desc)
 
     # generate friends hash
     @friended = Hash.new(false)
