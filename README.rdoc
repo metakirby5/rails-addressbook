@@ -1,3 +1,9 @@
 == README
 
 Remember to <tt>gem install</tt>!
+
+=== FEATURES
+* REST API for CRUD operations on contacts and friendships
+* Server-side validation on contacts and friendships
+* Inline contact info updates
+* User authentication, per-user friendships
