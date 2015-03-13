@@ -2,7 +2,7 @@
 
 My first Rails app: a small address book app.
 
-Remember to <tt>gem install</tt>!
+Remember to <tt>bundle install</tt>!
 
 === FEATURES
 * REST API for CRUD operations on contacts and friendships
