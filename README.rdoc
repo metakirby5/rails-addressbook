@@ -2,7 +2,9 @@
 
 My first Rails app: a small address book app.
 
-Remember to <tt>bundle install</tt>!
+Remember to:
+  bundle install
+  rake db:migrate
 
 === FEATURES
 * REST API for CRUD operations on contacts and friendships
